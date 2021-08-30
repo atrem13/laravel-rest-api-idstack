@@ -48,7 +48,7 @@ class TransactionController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => ['required'],
             'amount' => ['required', 'numeric'],
-            'type' => ['required', 'in:expense, revenue'],
+            'type' => ['required', 'in:expense,revenue'],
         ]);
 
         if($validator->fails()){
@@ -110,7 +110,39 @@ class TransactionController extends Controller
      */
     public function update(Request $request, Transaction $transaction)
     {
-        //
+        $transaction = Transaction::findOrFail($transaction->id);
+        $validator = Validator::make($request->all(), [
+            'title' => ['required'],
+            'amount' => ['required', 'numeric'],
+            'type' => ['required', 'in:expense,revenue'],
+        ]);
+
+        if($validator->fails()){
+            $response = [
+                'message' => 'Input Data Invalid',
+                'data' => $validator->errors(),
+                'code' => 400
+            ];
+            return response()->json($response);
+        }
+
+        try{
+            $transaction->update($request->all());
+            $response = [
+                'message' => 'Updated Data Transaction',
+                'data' => $transaction,
+                'code' => 200
+            ];
+
+            return response()->json($response);
+        }catch(Exception $e){
+            $response = [
+                'message' => 'Failed: ' . $e->getMessage(),
+                'data' => NULL,
+                'code' => 500
+            ];
+            return response()->json($response);
+        }
     }
 
     /**
@@ -121,6 +153,24 @@ class TransactionController extends Controller
      */
     public function destroy(Transaction $transaction)
     {
-        //
+        $transaction = Transaction::findOrFail($transaction->id);
+
+        try{
+            $transaction->delete();
+            $response = [
+                'message' => 'Deleted Data Transaction',
+                'data' => $transaction,
+                'code' => 200
+            ];
+
+            return response()->json($response);
+        }catch(Exception $e){
+            $response = [
+                'message' => 'Failed: ' . $e->getMessage(),
+                'data' => NULL,
+                'code' => 500
+            ];
+            return response()->json($response);
+        }
     }
 }
