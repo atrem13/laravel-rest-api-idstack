@@ -87,7 +87,14 @@ class TransactionController extends Controller
      */
     public function show(Transaction $transaction)
     {
-        //
+        $transaction = Transaction::findOrFail($transaction->id);
+        $response = [
+            'message' => 'Show Data Transaction',
+            'data' => $transaction,
+            'code' => 200
+        ];
+
+        return response()->json($response);
     }
 
     /**
@@ -154,7 +161,6 @@ class TransactionController extends Controller
     public function destroy(Transaction $transaction)
     {
         $transaction = Transaction::findOrFail($transaction->id);
-
         try{
             $transaction->delete();
             $response = [
